@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreakSearch Chatbot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F4F6;
+            color: #1a202c;
+            height: 100vh;
+            display: flex;
+            overflow: auto;
+        }
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background-color: #F9FAFB;
+            border-right: 1px solid #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            z-index: 50;
+        }
+        .main-content-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;  
+            padding: 2rem;
+            position: relative;
+        }
+        .chat-container {
+            flex-grow: 1;
+            width: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            margin-top: 2rem;
+        }
+        .input-area {
+            width: 100%;
+            max-width: 768px;
+            padding: 1rem;
+            background-color: #F3F4F6;
+            margin: 0 auto;
+        }
+        .typing-indicator span {
+            animation: bounce 1.4s infinite ease-in-out both;
+            background-color: #6B7280;
+            border-radius: 50%;
+            display: inline-block;
+            height: 8px;
+            width: 8px;
+        }
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="sidebar" class="sidebar">
+        <h1 class="text-xl font-semibold text-gray-900 mb-4">FreakSearch</h1>
+        <button class="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md mt-4 flex items-center justify-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>New chat</span>
+        </button>
+        <div class="mt-6 flex-grow overflow-y-auto space-y-2">
+            <div class="flex items-center space-x-2 mb-2">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Recent</h3>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-gray-400">
+                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div id="past-chats-list" class="space-y-1">
+                </div>
+        </div>
+        <div class="mt-auto pt-4 border-t border-gray-200">
+            <button class="flex items-center w-full p-2 rounded-lg text-gray-800 hover:bg-gray-100 transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.79 4 4s-1.79 4-4 4c-.736 0-1.428-.198-2.03-.559M16.5 12a4.5 4.5 0 11-9 0m9 0a4.5 4.5 0 11-9 0m9 0c.266 0 .52-.027.765-.08C17.653 11.758 18 11.237 18 10.5M10.5 14.5A2.5 2.5 0 0113 12H6a2.5 2.5 0 012.5-2.5 2.5 2.5 0 012.5 2.5z"></path>
+                </svg>
+                <span>Help</span>
+            </button>
+            <button class="flex items-center w-full p-2 rounded-lg text-gray-800 hover:bg-gray-100 transition-colors duration-200 mt-1">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <span>Feedback</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content-container">
+        <div id="chat-container" class="chat-container">
+            <div id="chat-messages" class="w-full max-w-4xl mx-auto flex flex-col items-center justify-end">
+                <div class="text-3xl font-bold text-gray-900 mb-8">What can I help with?</div>
+                <div class="flex justify-start w-full">
+                    <div class="p-3 rounded-xl max-w-md shadow-md bg-gray-200 text-gray-800">
+                        Hi there! Welcome to FreakSearch. I'm here to help you get started. What's on your mind?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="chat-form" class="w-full max-w-4xl mx-auto flex items-center rounded-xl p-2 bg-gray-50 border border-gray-300 shadow-md">
+            <button type="button" id="toggle-attach" class="p-3 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </button>
+            <input type="text" id="chat-input" placeholder="Ask anything..." class="flex-grow p-3 bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none">
+            
+            <div class="flex items-center space-x-1">
+                <button type="button" id="record-btn" class="p-3 text-gray-600 rounded-full hover:bg-gray-100 transition-colors duration-200">
+                    <svg id="mic-icon" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+                <button type="submit" class="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-200">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <input type="file" id="image-input" accept="image/*" class="hidden">
+        <input type="file" id="video-input" accept="video/*" class="hidden">
+        <input type="file" id="file-input" class="hidden">
+        
+        <div id="attachment-menu" class="hidden absolute bottom-24 left-1/2 -ml-36 transform -translate-x-1/2 bg-gray-50 rounded-xl shadow-xl border border-gray-200 p-2 space-y-2 z-10 w-72">
+            <button id="file-btn" class="flex items-center space-x-2 w-full p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6M10 21h4a2 2 0 002-2v-4a2 2 0 00-2-2h-4a2 2 0 00-2 2v4a2 2 0 002 2z"></path></svg>
+                <span>Document</span>
+            </button>
+            <button id="image-btn" class="flex items-center space-x-2 w-full p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L15 16m-2-2l1.293-1.293a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span>Image</span>
+            </button>
+            <button id="video-btn" class="flex items-center space-x-2 w-full p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <span>Video</span>
+            </button>
+            <button class="flex items-center space-x-2 w-full p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.724l-.213.213A4 4 0 0020 13.828l-1.102 1.101m-.758-4.724l-.213.213A4 4 0 0020 13.828l-1.102 1.101"></path></svg>
+                <span>URL</span>
+            </button>
+        </div>
+    </div>
+
+    
+    <script>
+        const chatContainer = document.getElementById('chat-container'); 
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const toggleAttachButton = document.getElementById('toggle-attach');
+        const attachmentMenu = document.getElementById('attachment-menu');
+        const pastChatsList = document.getElementById('past-chats-list');
+
+        // File input buttons and elements
+        const imageBtn = document.getElementById('image-btn');
+        const videoBtn = document.getElementById('video-btn');
+        const fileBtn = document.getElementById('file-btn');
+        const imageInput = document.getElementById('image-input');
+        const videoInput = document.getElementById('video-input');
+        const fileInput = document.getElementById('file-input');
+
+        let chatHistory = [];
+        const API_URL = '/api/chatbot';
+        const UPLOAD_API_URL = '/api/upload-media';
+        
+        const pastChats = [];
+
+       function displayMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('flex', 'w-full', isUser ? 'justify-end' : 'justify-start', 'mt-4');
+        const messageClasses = isUser ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800';
+
+    // Replace newlines with <br> for proper line breaks
+        const formattedText = text.replace(/\n/g, '<br>');
+
+        messageDiv.innerHTML = `
+            <div class="p-3 rounded-xl max-w-lg shadow-md ${messageClasses}">
+                ${formattedText}
+            </div>
+    `   ;
+        chatMessages.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.classList.add('flex', 'w-full', 'justify-start', 'mt-4');
+            typingDiv.innerHTML = `
+                <div class="p-3 rounded-xl max-w-lg shadow-md bg-gray-200 text-gray-800">
+                    <div class="flex items-center space-x-2 typing-indicator">
+                        <span class="bg-gray-500 rounded-full w-2 h-2"></span>
+                        <span class="bg-gray-500 rounded-full w-2 h-2"></span>
+                        <span class="bg-gray-500 rounded-full w-2 h-2"></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        async function fetchChatHistory(userId) {
+            try {
+                // Use the user_id from the login process. For now, hardcode for testing.
+                const response = await fetch(`/api/chat-history?user_id=${userId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch chat history');
+                }
+             const data = await response.json();
+                
+                // Assuming data.history is an array of objects
+                // like [{id: 1, input_text: "...", created_at: "..."}]
+                return data.history; 
+                
+            } catch (error) {
+                console.error("Error fetching chat history:", error);
+                return []; // Return an empty array on error
+            }
+        }
+
+        function renderPastChats(chats) {
+            pastChatsList.innerHTML = '';
+            if (!chats || chats.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.classList.add('text-gray-500', 'text-sm', 'p-2');
+                emptyMsg.textContent = "No chat history yet.";
+                pastChatsList.appendChild(emptyMsg);
+                return;
+            }
+            chats.forEach(chatTitle => {
+                const chatItem = document.createElement('a');
+                chatItem.href = '#';
+                chatItem.classList.add(
+                    'block', 'p-2', 'rounded-lg', 'text-gray-800',
+                    'hover:bg-gray-100', 'transition-colors', 'duration-200'
+                );
+                chatItem.textContent = chatTitle;
+                pastChatsList.appendChild(chatItem);
+            });
+        }
+
+        async function getBotResponse(userMessage) {
+            showTypingIndicator();
+            
+            chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+
+            const payload = {
+                message: userMessage,
+                chatHistory: chatHistory
+            };
+
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                const response = await fetch(API_URL, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                const botResponse = result?.text;
+                
+                if (botResponse) {
+                    displayMessage(botResponse, false);
+                    chatHistory.push({ role: 'model', parts: [{ text: botResponse }] });
+                } else {
+                    displayMessage('Sorry, I couldn\'t get a response. Please try again.', false);
+                }
+            } catch (error) {
+                console.error("Failed to fetch from backend:", error);
+                displayMessage('An error occurred. Please check the console for details.', false);
+            } finally {
+                hideTypingIndicator();
+            }
+        }
+        chatForm.addEventListener('submit', function(event) {
+           event.preventDefault();
+           const userMessage = chatInput.value.trim();
+           if (userMessage) {
+                displayMessage(userMessage, true);
+
+        // ✅ Save chat BEFORE clearing input (safer)
+                fetch('/api/save-chat', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        user_id: 130, // Replace with logged-in user id dynamically
+                        input_text: userMessage
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        console.error("Failed to save chat:", res.status);
+                    }
+                })
+                .catch(err => console.error("Failed to save chat:", err));
+
+                chatInput.value = ''; // Clear input AFTER saving attempt
+                getBotResponse(userMessage);
+           }
+        });
+
+
+        toggleAttachButton.addEventListener('click', function() {
+            attachmentMenu.classList.toggle('hidden');
+        });
+
+        // --- Voice Recording Logic (commented out as backend not available) ---
+        // let isRecording = false;
+        // let mediaRecorder;
+        // let audioChunks = [];
+        // const recordBtn = document.getElementById('record-btn');
+        // const AUDIO_API_URL = '/api/audio-to-text';
+
+        // recordBtn.addEventListener('click', async () => {
+        //     if (!isRecording) {
+        //         try {
+        //             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        //             mediaRecorder = new MediaRecorder(stream);
+        //             mediaRecorder.start();
+        //             isRecording = true;
+                    
+        //             recordBtn.classList.add('text-red-500');
+        //             displayMessage('Recording...', true);
+
+        //             mediaRecorder.ondataavailable = event => {
+        //                 audioChunks.push(event.data);
+        //             };
+
+        //             mediaRecorder.onstop = async () => {
+        //                 const audioBlob = new Blob(audioChunks, { type: 'audio/webm; codecs=opus' });
+        //                 audioChunks = [];
+                        
+        //                 const formData = new FormData();
+        //                 formData.append('audio', audioBlob, 'recording.webm');
+
+        //                 const recordingMessage = chatMessages.querySelector('.justify-end:last-of-type');
+        //                 if (recordingMessage && recordingMessage.textContent.trim() === 'Recording...') {
+        //                      recordingMessage.remove();
+        //                 }
+                        
+        //                 showTypingIndicator();
+
+        //                 try {
+        //                     const response = await fetch(AUDIO_API_URL, {
+        //                         method: 'POST',
+        //                         body: formData
+        //                     });
+
+        //                     if (!response.ok) {
+        //                         throw new Error(`HTTP error! status: ${response.status}`);
+        //                     }
+        //                     const result = await response.json();
+        //                     const transcribedText = result?.text;
+                            
+        //                     if (transcribedText) {
+        //                         displayMessage(transcribedText, true);
+        //                         getBotResponse(transcribedText);
+        //                     } else {
+        //                         displayMessage('Sorry, I could not transcribe the audio.', false);
+        //                     }
+
+        //                 } catch (error) {
+        //                     console.error("Failed to send audio to backend:", error);
+        //                     displayMessage('An error occurred during transcription.', false);
+        //                 } finally {
+        //                     hideTypingIndicator();
+        //                 }
+        //                 stream.getTracks().forEach(track => track.stop());
+        //             };
+        //         } catch (err) {
+        //             console.error('Error accessing microphone:', err);
+        //             displayMessage('Error: Could not access microphone. Please ensure permissions are granted.', false);
+        //         }
+        //     } else {
+        //         mediaRecorder.stop();
+        //         isRecording = false;
+        //         recordBtn.classList.remove('text-red-500');
+        //     }
+        // });
+        
+        // --- File Upload Logic ---
+        function handleFileUpload(file) {
+            displayMessage(`Uploading file: ${file.name}...`, true);
+            showTypingIndicator();
+
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch(UPLOAD_API_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                hideTypingIndicator();
+                displayMessage(`File "${file.name}" uploaded successfully! The backend would now process it.`, false);
+            })
+            .catch(error => {
+                console.error("File upload failed:", error);
+                hideTypingIndicator();
+                displayMessage(`An error occurred while uploading "${file.name}".`, false);
+            });
+        }
+
+        imageBtn.addEventListener('click', () => {
+            imageInput.click();
+        });
+        imageInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        videoBtn.addEventListener('click', () => {
+            videoInput.click();
+        });
+        videoInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        fileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        // ... (existing code for file upload listeners)
+
+        // ---------------------------------------------
+        // Replace the line 'renderPastChats();' with this block
+        document.addEventListener('DOMContentLoaded', async () => {
+            // NOTE: You need a way to get the logged-in user's ID.
+            // This is a placeholder; you'll need to store the user ID
+            // in local storage or a session cookie after a successful login.
+            const userId = 130; 
+            
+            const pastChatsData = await fetchChatHistory(userId);
+            console.log("Fetched chat history:", pastChatsData);
+            renderPastChats(pastChatsData.map(chat => chat.input_text));
+        });
+        
+    </script>
+</body>
+</html>

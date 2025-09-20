@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreakSearch - Your Source for Verified Information</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB;
+            color: #1a202c;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
+
+        <header class="w-full flex justify-between items-center py-4 px-8 mb-12">
+            <h1 class="text-3xl font-bold text-blue-700">FreakSearch</h1>
+            <nav class="flex items-center space-x-4">
+                <a href="#" class="px-4 py-2 text-gray-600 font-semibold hover:text-blue-600 transition-colors duration-300">Download</a>
+                <a href="#features-section" class="px-4 py-2 text-gray-600 font-semibold hover:text-blue-600 transition-colors duration-300">Features</a>
+                <button onclick="document.getElementById('join-section').scrollIntoView({ behavior: 'smooth' });" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-md">Sign In</button>
+            </nav>
+        </header>
+
+        <section class="text-center mb-16 px-4">
+            <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
+                Your Source for Verified Information
+            </h2>
+            <p class="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                In an era of uncertainty, FreakSearch provides a new way to explore the web with transparency and trust. We flag misinformation so you can focus on the facts.
+            </p>
+            <button onclick="document.getElementById('join-section').scrollIntoView({ behavior: 'smooth' });" class="px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-xl transform hover:scale-105">Get Started</button>
+        </section>
+
+        <section id="features-section" class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
+            <div class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 text-center transition-transform transform hover:scale-105 hover:shadow-2xl duration-300">
+                <div class="text-4xl text-blue-600 mb-4 mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-blue-50">
+                    ✅
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-gray-800">Fact-Checked Results</h3>
+                <p class="text-gray-600 text-sm">Our algorithm cross-references information with reputable sources to highlight potential misinformation.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 text-center transition-transform transform hover:scale-105 hover:shadow-2xl duration-300">
+                <div class="text-4xl text-blue-600 mb-4 mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-blue-50">
+                    🔗
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-gray-800">Source Transparency</h3>
+                <p class="text-gray-600 text-sm">We provide clear ratings and context for the sources you encounter, empowering you to make informed decisions.</p>
+            </div>
+            <div class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 text-center transition-transform transform hover:scale-105 hover:shadow-2xl duration-300">
+                <div class="text-4xl text-blue-600 mb-4 mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-blue-50">
+                    ⚠️
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-gray-800">Misinformation Alerts</h3>
+                <p class="text-gray-600 text-sm">When you click on a potentially unreliable link, we give you an alert and suggest better alternatives.</p>
+            </div>
+        </section>
+
+        <section id="join-section" class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
+            <h3 class="text-3xl font-bold text-gray-900 mb-2">Join Our Community</h3>
+            <p class="text-sm text-gray-500 mb-6">Gain access to saved searches and personalized content by signing in.</p>
+
+            <form id="login-form" class="space-y-4">
+                <input type="text" id="login-username" placeholder="Username" required class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 shadow-sm">
+                <input type="password" id="login-password" placeholder="Password" required class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 shadow-sm">
+                <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-lg">Sign In</button>
+                <p id="login-message" class="text-sm text-red-600 hidden"></p>
+            </form>
+
+            <div class="mt-4 text-sm text-gray-600">
+                <p>Don't have an account? <a href="#" onclick="openSignupModal(); return false;" class="text-blue-600 font-medium hover:underline">Sign Up</a></p>
+                <div class="relative flex items-center my-4">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-gray-400 text-sm">or</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+                <button onclick="continueAsGuest()" class="w-full py-4 bg-gray-200 text-gray-700 font-semibold rounded-full hover:bg-gray-300 transition-colors duration-300 shadow-lg">
+                    Continue as a Guest
+                </button>
+            </div>
+        </section>
+
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            <p>&copy; <span id="current-year"></span> FreakSearch. All rights reserved.</p>
+        </footer>
+        
+    </div>
+
+    <div id="signup-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden modal-overlay">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm relative">
+            <button onclick="closeSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-2 text-center">Create Your Account</h3>
+            <p class="text-sm text-gray-500 mb-6 text-center">Join FreakSearch and explore with confidence.</p>
+
+            <form id="signup-form" class="space-y-4">
+                <input type="text" id="signup-full-name" placeholder="Full Name" required class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 shadow-sm">
+                <input type="text" id="signup-username" placeholder="Username" required class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 shadow-sm">
+                <input type="email" id="signup-email" placeholder="Email Address" required class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 shadow-sm">
+                <input type="password" id="signup-password" placeholder="Password" required class="w-full p-4 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300 shadow-sm">
+                <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-300 shadow-lg">Sign Up</button>
+                <p id="signup-message" class="text-sm text-red-600 hidden text-center"></p>
+            </form>
+            <p class="mt-4 text-sm text-gray-600 text-center">
+                Already have an account? <a href="#" onclick="closeSignupModal(); document.getElementById('join-section').scrollIntoView({ behavior: 'smooth' }); return false;" class="text-blue-600 font-medium hover:underline">Sign In</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Set current year dynamically
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // ✅ Guest button handler
+        function continueAsGuest() {
+            const msgEl = document.getElementById('login-message');
+            msgEl.classList.remove('hidden');
+            msgEl.classList.remove('text-red-600');
+            msgEl.classList.add('text-green-600');
+            msgEl.textContent = "You are now exploring as a guest...";
+            setTimeout(() => {
+                window.location.href = '/chat'; // redirect to chatbot page
+            }, 1000);
+        }
+
+        // ✅ Handle login form
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const msgEl = document.getElementById('login-message');
+
+            if (!username || !password) {
+                msgEl.classList.remove('hidden');
+                msgEl.textContent = "Please enter both username and password.";
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    msgEl.classList.remove('hidden');
+                    msgEl.classList.remove('text-red-600');
+                    msgEl.classList.add('text-green-600');
+                    msgEl.textContent = data.message + " Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = '/chat';
+                    }, 1000);
+                } else {
+                    msgEl.classList.remove('hidden');
+                    msgEl.classList.remove('text-green-600');
+                    msgEl.classList.add('text-red-600');
+                    msgEl.textContent = "Login failed: " + data.detail;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                msgEl.classList.remove('hidden');
+                msgEl.classList.add('text-red-600');
+                msgEl.textContent = "An error occurred during login.";
+            }
+        });
+
+        // ✅ Sign-up modal functions
+        function openSignupModal() {
+            document.getElementById('signup-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevents scrolling on the main page
+        }
+
+        function closeSignupModal() {
+            document.getElementById('signup-modal').classList.add('hidden');
+            document.body.style.overflow = ''; // Restores scrolling
+        }
+
+        // ✅ Handle sign-up form
+        document.getElementById('signup-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById('signup-full-name').value.trim();
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+            const msgEl = document.getElementById('signup-message');
+
+            if (!fullName || !username || !email || !password) {
+                msgEl.classList.remove('hidden');
+                msgEl.textContent = "Please fill in all fields.";
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name: fullName, username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    msgEl.classList.remove('hidden');
+                    msgEl.classList.remove('text-red-600');
+                    msgEl.classList.add('text-green-600');
+                    msgEl.textContent = data.message + " Redirecting to chat...";
+                    setTimeout(() => {
+                        window.location.href = '/chat';
+                    }, 1000);
+                } else {
+                    msgEl.classList.remove('hidden');
+                    msgEl.classList.remove('text-green-600');
+                    msgEl.classList.add('text-red-600');
+                    msgEl.textContent = "Registration failed: " + data.detail;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                msgEl.classList.remove('hidden');
+                msgEl.classList.add('text-red-600');
+                msgEl.textContent = "An error occurred during registration.";
+            }
+        });
+    </script>
+</body>
+</html>

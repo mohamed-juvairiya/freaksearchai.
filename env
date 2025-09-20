@@ -1,0 +1,12 @@
+# .env file
+# API Keys
+GEMINI_API_KEY=AIzaSyCrkOR82ajDsH7dxFQB4FqfJLmvXrOLSj4    
+GOOGLE_API_KEY=AIzaSyBNbJtL4AodyDQWMXUOUNjGSh9BKDIh9-I
+SEARCH_ENGINE_ID=20afdf091cfb1447c
+
+
+# Database Credentials
+DB_HOST= localhost #10.120.151.2
+DB_USER=root # Or your specific database user
+DB_PASSWORD=root
+DB_NAME=login_id
