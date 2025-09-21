@@ -79,7 +79,7 @@
 
     <div id="sidebar" class="sidebar">
         <h1 class="text-xl font-semibold text-gray-900 mb-4">FreakSearch</h1>
-        <button class="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md mt-4 flex items-center justify-center space-x-2">
+        <button class="bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md mt-4 flex items-center justify-center space-x-2" onclick="startNewChat()">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -141,12 +141,16 @@
                     </svg>
                 </button>
                 <button type="submit" class="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-200">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </button>
             </div>
         </form>
+
+        <div class="disclaimer mt-2 text-center text-xs text-gray-500">
+            This is a limit-based application. You can send the next prompt after 2 minutes.
+        </div>
 
         <input type="file" id="image-input" accept="image/*" class="hidden">
         <input type="file" id="video-input" accept="video/*" class="hidden">
@@ -275,6 +279,22 @@
                 chatItem.textContent = chatTitle;
                 pastChatsList.appendChild(chatItem);
             });
+        }
+        
+        function startNewChat() {
+            if (confirm("Are you sure you want to start a new chat? This will clear the current conversation.")) {
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML = `
+                    <div class="text-3xl font-bold text-gray-900 mb-8">What can I help with?</div>
+                    <div class="flex justify-start w-full">
+                        <div class="p-3 rounded-xl max-w-md shadow-md bg-gray-200 text-gray-800">
+                            Hi there! Welcome to FreakSearch. I'm here to help you get started. What's on your mind?
+                        </div>
+                    </div>
+                `;
+                chatHistory = []; // Also clear the in-memory chat history
+                console.log("New chat started.");
+            }
         }
 
         async function getBotResponse(userMessage) {
